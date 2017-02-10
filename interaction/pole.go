@@ -23,3 +23,14 @@ func StartPoleLogic() <-chan bool {
 	}()
 	return poleSignal
 }
+
+// TODO which id to do pole?
+// actualTime := time.Now()
+// if actualTime.Hour() == 0 && actualTime.Minute() == 0 {
+// 	msg := tgbotapi.NewMessage(ADD ID HERE, "pole")
+// 	go func(){
+// 		wait := rand.Intn(5000)
+// 		<-time.After(wait * time.Millisecond)
+// 		bot.Send(msg)
+// 	}
+// }

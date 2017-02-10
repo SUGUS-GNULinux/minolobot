@@ -35,65 +35,62 @@ func main() {
 		<-updates
 	}
 	// gets the channel to receive the pole signal
-	doPole := interaction.StartPoleLogic()
 	listTasks := []func(string) string{interaction.CheckPs, interaction.CheckCion,
 		interaction.AnswerDeGoma}
 	//////////////////
-	// starts routine
+	// starts routines
 	//////////////////
-	for {
-		select {
-		case update := <-updates:
-			if update.Message == nil {
-				continue
-			}
-			// command processing
-			if update.Message.IsCommand() {
-				switch update.Message.Command() {
-				case "help":
-					command.HelpCommand(bot, update)
-				case "setactivity":
-					command.ActivityCommand(bot, update)
-				case "anwswerprob":
-					command.AnswerFrec(bot, update)
-				case "status":
-					command.Status(bot, update)
-				}
-			}
-			// if activity is not enabled just tries to receive the commands
-			if !config.Enabled {
-				continue
-			}
-			// pattern processing
-			s := string(update.Message.Text)
-			for _, task := range listTasks {
-				if modString := task(s); modString != "" {
-					msg := tgbotapi.NewMessage(update.Message.Chat.ID, modString)
-					bot.Send(msg)
-					continue
-				}
-			}
-			// random answer
-			if rand.Intn(99) < config.PercentAnswer {
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, interaction.Reply())
-				msg.ReplyToMessageID = update.Message.MessageID
-				bot.Send(msg)
-			}
+	go func(bot *tgbotapi.BotAPI) {
+		doPole := interaction.StartPoleLogic()
 		// TODO find way to add generic chat id
-		case <-doPole:
-			// msg := tgbotapi.NewMessage(12345678, "pole")
-			// bot.Send(msg)
-		default:
-			// TODO which id to do pole?
-			// actualTime := time.Now()
-			// if actualTime.Hour() == 0 && actualTime.Minute() == 0 {
-			// 	msg := tgbotapi.NewMessage(ADD ID HERE, "pole")
-			// 	go func(){
-			// 		wait := rand.Intn(5000)
-			// 		<-time.After(wait * time.Millisecond)
-			// 		bot.Send(msg)
-			// 	}
-			// }
+		for _ = range doPole {
+			for id := range config.IDList {
+				msg := tgbotapi.NewMessage(id, "pole")
+				bot.Send(msg)
+
+			}
+		}
+	}(bot)
+
+	for update := range updates {
+		if update.Message == nil {
+			continue
+		}
+		// chat id registration
+		if !config.IDList[update.Message.Chat.ID] {
+			config.IDList[update.Message.Chat.ID] = true
+		}
+		// command processing
+		if update.Message.IsCommand() {
+			switch update.Message.Command() {
+			case "help":
+				command.HelpCommand(bot, update)
+			case "setactivity":
+				command.ActivityCommand(bot, update)
+			case "anwswerprob":
+				command.AnswerFrec(bot, update)
+			case "status":
+				command.Status(bot, update)
+			}
+		}
+		// if activity is not enabled just tries to receive the commands
+		if !config.Enabled {
+			continue
+		}
+		// pattern processing
+		s := string(update.Message.Text)
+		for _, task := range listTasks {
+			if modString := task(s); modString != "" {
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, modString)
+				bot.Send(msg)
+				continue
+			}
+		}
+		// random answer
+		if rand.Intn(99) < config.PercentAnswer {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, interaction.Reply())
+			msg.ReplyToMessageID = update.Message.MessageID
+			bot.Send(msg)
 		}
 	}
 }

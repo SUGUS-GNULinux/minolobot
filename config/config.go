@@ -8,8 +8,14 @@ import (
 	"os"
 )
 
-// PercentAnswer is the probability of anwser to any update
-var PercentAnswer = 20
+var (
+	// Enabled defines if the bot should answer
+	Enabled = true
+	// Token is the token value of the bot
+	Token string
+	// PercentAnswer is the probability of anwser to any update
+	PercentAnswer = 10
+)
 
 // init token
 func init() {
@@ -26,13 +32,18 @@ func init() {
 	}
 }
 
-// global variables
 var (
-	// Enabled defines if the bot should answer
-	Enabled = true
-	// Token is the token value of the bot
-	Token string
+	// Phrases is the list of predefined phrases to say randomly
+	Phrases = []string{}
+	// CionList is the list of words ending with "cion"
+	CionList map[string]bool
+	// IDList contains all the user IDs of the updates of the actual session
+	IDList map[int64]bool
 )
+
+func init() {
+	IDList = make(map[int64]bool)
+}
 
 // init "cion" ended words list and phrases list
 func init() {
@@ -63,10 +74,3 @@ func init() {
 		panic(err)
 	}
 }
-
-var (
-	// Phrases is the list of predefined phrases to say randomly
-	Phrases = []string{}
-	// CionList is the list of words ending with "cion"
-	CionList map[string]bool
-)
