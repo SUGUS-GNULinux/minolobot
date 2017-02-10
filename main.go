@@ -70,7 +70,7 @@ nextUpdate:
 				command.ActivityCommand(bot, update)
 				continue
 			case "anwswerprob":
-				command.AnswerFrec(bot, update)
+				command.AnswerFreq(bot, update)
 				continue
 			case "status":
 				command.Status(bot, update)

@@ -4,6 +4,7 @@ package command
 import (
 	"fmt"
 	"minolobot/config"
+	"strconv"
 
 	"gopkg.in/telegram-bot-api.v4"
 )
@@ -19,7 +20,8 @@ status - estado del bot
 func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	help := "/help - información general\n" +
 		"/setactivity - habilita o deshabilita las interacciones\n" +
-		"/anwswerprob - probabilidad de responder con frases aleatorias\n" +
+		"/anwswerprob - probabilidad de responder con frases aleatorias, se define" +
+		" añadiendo un numero tras el comando entre 0 y 100\n" +
 		"/status - estado del bot\n" +
 		"pspsps"
 	msg := tgbotapi.NewMessage(u.Message.Chat.ID, help)
@@ -33,10 +35,18 @@ func ActivityCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	bot.Send(msg)
 }
 
-// AnswerFrec handles the asignation of a new frequence in the answers
-func AnswerFrec(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
-	// TODO
-	msg := tgbotapi.NewMessage(u.Message.Chat.ID, "TO DO")
+// AnswerFreq handles the asignation of a new frequence in the answers
+func AnswerFreq(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
+	value, err := strconv.Atoi(u.Message.CommandArguments())
+	var msg tgbotapi.MessageConfig
+	if err != nil || err == nil && (value > 100 || value < 0) {
+		msg = tgbotapi.NewMessage(u.Message.Chat.ID,
+			"hola como uso un comando? unsaludogracias xd")
+	} else {
+		config.PercentAnswer = value
+		msg = tgbotapi.NewMessage(u.Message.Chat.ID,
+			"omgggggg actualizaçao")
+	}
 	bot.Send(msg)
 }
 
