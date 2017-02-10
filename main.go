@@ -47,11 +47,11 @@ func main() {
 			for id := range config.IDList {
 				msg := tgbotapi.NewMessage(id, "pole")
 				bot.Send(msg)
-
 			}
 		}
 	}(bot)
 
+nextUpdate:
 	for update := range updates {
 		if update.Message == nil {
 			continue
@@ -65,12 +65,16 @@ func main() {
 			switch update.Message.Command() {
 			case "help":
 				command.HelpCommand(bot, update)
+				continue
 			case "setactivity":
 				command.ActivityCommand(bot, update)
+				continue
 			case "anwswerprob":
 				command.AnswerFrec(bot, update)
+				continue
 			case "status":
 				command.Status(bot, update)
+				continue
 			}
 		}
 		// if activity is not enabled just tries to receive the commands
@@ -83,7 +87,7 @@ func main() {
 			if modString := task(s); modString != "" {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, modString)
 				bot.Send(msg)
-				continue
+				continue nextUpdate
 			}
 		}
 		// random answer

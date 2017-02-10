@@ -2,6 +2,7 @@ package interaction
 
 import (
 	"math/rand"
+	"minolobot/config"
 	"time"
 )
 
@@ -15,7 +16,7 @@ func StartPoleLogic() <-chan bool {
 	go func() {
 		for _ = range tick.C {
 			counter++
-			if rand.Intn(100) < counter {
+			if config.Enabled && rand.Intn(100) < counter {
 				poleSignal <- true
 				counter = 0
 			}
