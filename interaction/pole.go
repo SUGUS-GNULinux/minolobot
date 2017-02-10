@@ -6,32 +6,33 @@ import (
 	"time"
 )
 
-// StartPoleLogic starts an internal counter which increments every hour,
-// the higher the value of the counter the more possible the emmission of a
-// true value in the returned channel
+// StartPoleLogic starts the logic to send a signal at 00:00, when it's
+// started calculates the time until the next day and after that blocks in periods
+// of 24h.
 func StartPoleLogic() <-chan bool {
-	counter := 0
-	tick := time.NewTicker(time.Hour)
 	poleSignal := make(chan bool)
+	now := time.Now()
+	tomorrow := now.AddDate(0, 0, 1)
+	untilTwelve := now.Sub(time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day(),
+		0, 0, 0, 0, tomorrow.Location()))
+	firstSignal := time.After(untilTwelve)
 	go func() {
+		// block until 00:00
+		<-firstSignal
+		tick := time.NewTicker(time.Hour * 24)
+		if config.Enabled {
+			go delayActivation(poleSignal)
+		}
 		for _ = range tick.C {
-			counter++
-			if config.Enabled && rand.Intn(100) < counter {
-				poleSignal <- true
-				counter = 0
+			if config.Enabled {
+				go delayActivation(poleSignal)
 			}
 		}
 	}()
 	return poleSignal
 }
 
-// TODO which id to do pole?
-// actualTime := time.Now()
-// if actualTime.Hour() == 0 && actualTime.Minute() == 0 {
-// 	msg := tgbotapi.NewMessage(ADD ID HERE, "pole")
-// 	go func(){
-// 		wait := rand.Intn(5000)
-// 		<-time.After(wait * time.Millisecond)
-// 		bot.Send(msg)
-// 	}
-// }
+func delayActivation(c chan bool) {
+	<-time.After(time.Millisecond * time.Duration(rand.Intn(4000)))
+	c <- true
+}
