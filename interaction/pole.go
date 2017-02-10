@@ -13,8 +13,8 @@ func StartPoleLogic() <-chan bool {
 	poleSignal := make(chan bool)
 	now := time.Now()
 	tomorrow := now.AddDate(0, 0, 1)
-	untilTwelve := now.Sub(time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day(),
-		0, 0, 0, 0, tomorrow.Location()))
+	untilTwelve := time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day(),
+		0, 0, 0, 0, tomorrow.Location()).Sub(now)
 	firstSignal := time.After(untilTwelve)
 	go func() {
 		// block until 00:00
