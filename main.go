@@ -57,7 +57,7 @@ nextUpdate:
 			continue
 		}
 		// chat id registration
-		if !config.IDList[update.Message.Chat.ID] {
+		if update.Message.Chat.IsGroup() && !config.IDList[update.Message.Chat.ID] {
 			config.IDList[update.Message.Chat.ID] = true
 		}
 		// command processing
