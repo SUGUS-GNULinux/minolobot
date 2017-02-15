@@ -9,7 +9,8 @@ import (
 	"gopkg.in/telegram-bot-api.v4"
 )
 
-/* command definition:
+/*
+command definition:
 help - información general
 setactivity - habilita o deshabilita las interacciones
 anwswerprob - probabilidad de responder con frases aleatorias
@@ -18,8 +19,8 @@ status - estado del bot
 
 // HelpCommand prints the main information
 func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
-	help := "/help - información general\n" +
-		"/setactivity - habilita o deshabilita las interacciones\n" +
+	help := "/setactivity - habilita o deshabilita las interacciones añadiendo" +
+		" true o false tras el comando.\n" +
 		"/anwswerprob - probabilidad de responder con frases aleatorias, se define" +
 		" añadiendo un numero tras el comando entre 0 y 100\n" +
 		"/status - estado del bot\n" +
@@ -30,8 +31,17 @@ func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 
 // ActivityCommand handles the enabled or diabled status
 func ActivityCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
-	// TODO
-	msg := tgbotapi.NewMessage(u.Message.Chat.ID, "TO DO")
+	msg := tgbotapi.NewMessage(u.Message.Chat.ID, "")
+	switch u.Message.CommandArguments() {
+	case "true":
+		msg.Text = "ey b0ss"
+		config.Enabled = true
+	case "false":
+		msg.Text = "ye"
+		config.Enabled = false
+	default:
+		msg.Text = "hola como uso un comando? unsaludogracias xd"
+	}
 	bot.Send(msg)
 }
 
@@ -55,5 +65,6 @@ func Status(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	statusData := fmt.Sprintf("Answer: %d%%\nInteraction Enabled: %v\n",
 		config.PercentAnswer, config.Enabled)
 	msg := tgbotapi.NewMessage(u.Message.Chat.ID, statusData)
+	msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 	bot.Send(msg)
 }
