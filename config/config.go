@@ -15,6 +15,8 @@ var (
 	Token string
 	// PercentAnswer is the probability of anwser to any update
 	PercentAnswer = 10
+	// BotName contains the @name of the bot after initializing in an account
+	BotName string
 )
 
 // init token

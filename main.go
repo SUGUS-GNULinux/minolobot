@@ -6,6 +6,7 @@ import (
 	"minolobot/command"
 	"minolobot/config"
 	"minolobot/interaction"
+	"strings"
 	"time"
 
 	"gopkg.in/telegram-bot-api.v4"
@@ -20,6 +21,7 @@ func main() {
 	if err != nil {
 		log.Panic(err)
 	} else {
+		config.BotName = "@" + bot.Self.UserName
 		log.Printf("Authorized on account %s", bot.Self.UserName)
 	}
 	u := tgbotapi.NewUpdate(0)
@@ -77,8 +79,9 @@ nextUpdate:
 				continue
 			}
 		}
-		// if activity is not enabled just tries to receive the commands
-		if !config.Enabled {
+		// if activity is not enabled just tries to receive the commands.
+		// if the message starts with @<botName> it ignores the disabled state.
+		if !config.Enabled && !strings.Contains(update.Message.Text, config.BotName) {
 			continue
 		}
 		// pattern processing
