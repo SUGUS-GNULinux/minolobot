@@ -44,7 +44,7 @@ func CheckCion(s string) (res string) {
 func CheckPs(s string) (res string) {
 	s = strings.ToLower(s)
 	if strings.Contains(s, "ps") {
-		res = "pspspsps"
+		res = strings.Repeat("ps", 4+rand.Intn(10))
 	}
 	return
 }
