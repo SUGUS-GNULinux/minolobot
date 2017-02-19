@@ -79,16 +79,22 @@ nextUpdate:
 				continue
 			}
 		}
+		// detection of ignore not enable conditions
+		mentionOrPrivate := strings.Contains(update.Message.Text, config.BotName) ||
+			update.Message.Chat.IsPrivate()
 		// if activity is not enabled just tries to receive the commands.
-		// if the message starts with @<botName> it ignores the disabled state.
-		if !config.Enabled && !strings.Contains(update.Message.Text, config.BotName) {
+		// if the message starts with @<botName> or a private msg,
+		// it ignores the disabled state.
+		if !(config.Enabled && mentionOrPrivate) {
 			continue
 		}
 		// pattern processing
 		s := string(update.Message.Text)
 		for _, task := range listTasks {
+			// if we get content to send from an interaction generator function we send it
 			if modString := task(s); modString != "" {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, modString)
+				msg.ReplyToMessageID = update.Message.MessageID
 				bot.Send(msg)
 				continue nextUpdate
 			}
