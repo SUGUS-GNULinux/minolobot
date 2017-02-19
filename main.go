@@ -68,10 +68,10 @@ nextUpdate:
 			case "help":
 				command.HelpCommand(bot, update)
 				continue
-			case "setactivity":
+			case "enable":
 				command.ActivityCommand(bot, update)
 				continue
-			case "anwswerprob":
+			case "anwswer":
 				command.AnswerFreq(bot, update)
 				continue
 			case "status":
@@ -82,10 +82,11 @@ nextUpdate:
 		// detection of ignore not enable conditions
 		mentionOrPrivate := strings.Contains(update.Message.Text, config.BotName) ||
 			update.Message.Chat.IsPrivate()
+		print(mentionOrPrivate)
 		// if activity is not enabled just tries to receive the commands.
 		// if the message starts with @<botName> or a private msg,
 		// it ignores the disabled state.
-		if !(config.Enabled && mentionOrPrivate) {
+		if !config.Enabled && !mentionOrPrivate {
 			continue
 		}
 		// pattern processing

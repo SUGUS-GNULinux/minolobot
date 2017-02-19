@@ -19,9 +19,9 @@ status - estado del bot
 
 // HelpCommand prints the main information
 func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
-	help := "/setactivity - habilita o deshabilita las interacciones añadiendo" +
+	help := "/enable - habilita o deshabilita las interacciones añadiendo" +
 		" true o false tras el comando.\n" +
-		"/anwswerprob - probabilidad de responder con frases aleatorias, se define" +
+		"/anwswer - probabilidad de responder con frases aleatorias, se define" +
 		" añadiendo un numero tras el comando entre 0 y 100\n" +
 		"/status - estado del bot\n" +
 		"pspsps"
