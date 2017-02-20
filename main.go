@@ -71,7 +71,7 @@ nextUpdate:
 			case "enable":
 				command.ActivityCommand(bot, update)
 				continue
-			case "anwswer":
+			case "answer":
 				command.AnswerFreq(bot, update)
 				continue
 			case "status":
