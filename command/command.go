@@ -12,8 +12,8 @@ import (
 /*
 command definition:
 help - información general
-setactivity - habilita o deshabilita las interacciones
-anwswerprob - probabilidad de responder con frases aleatorias
+enable - habilita o deshabilita las interacciones
+answer - probabilidad de responder con frases aleatorias
 status - estado del bot
 */
 
@@ -21,7 +21,7 @@ status - estado del bot
 func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	help := "/enable - habilita o deshabilita las interacciones añadiendo" +
 		" true o false tras el comando.\n" +
-		"/anwswer - probabilidad de responder con frases aleatorias, se define" +
+		"/answer - probabilidad de responder con frases aleatorias, se define" +
 		" añadiendo un numero tras el comando entre 0 y 100\n" +
 		"/status - estado del bot\n" +
 		"pspsps"
@@ -29,16 +29,18 @@ func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	bot.Send(msg)
 }
 
-// ActivityCommand handles the enabled or diabled status
-func ActivityCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
+// EnabledCommand handles the enabled or diabled status
+func EnabledCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(u.Message.Chat.ID, "")
 	switch u.Message.CommandArguments() {
 	case "true":
 		msg.Text = "ey b0ss"
-		config.Enabled = true
+		chatID := u.Message.Chat.ID
+		config.ConfigList[chatID].Enabled = true
 	case "false":
 		msg.Text = "ye"
-		config.Enabled = false
+		chatID := u.Message.Chat.ID
+		config.ConfigList[chatID].Enabled = false
 	default:
 		msg.Text = "hola como uso un comando? unsaludogracias xd"
 	}
@@ -53,7 +55,8 @@ func AnswerFreq(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 		msg = tgbotapi.NewMessage(u.Message.Chat.ID,
 			"hola como uso un comando? unsaludogracias xd")
 	} else {
-		config.PercentAnswer = value
+		chatID := u.Message.Chat.ID
+		config.ConfigList[chatID].PercentAnswer = value
 		msg = tgbotapi.NewMessage(u.Message.Chat.ID,
 			"omgggggg actualizaçao")
 	}
@@ -62,9 +65,10 @@ func AnswerFreq(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 
 // Status prints the internat status of the bot
 func Status(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
+	chatID := u.Message.Chat.ID
 	statusData := fmt.Sprintf("Answer: %d%%\nInteraction Enabled: %v\n",
-		config.PercentAnswer, config.Enabled)
+		config.ConfigList[chatID].PercentAnswer,
+		config.ConfigList[chatID].Enabled)
 	msg := tgbotapi.NewMessage(u.Message.Chat.ID, statusData)
-	msg.ReplyMarkup = tgbotapi.NewRemoveKeyboard(true)
 	bot.Send(msg)
 }

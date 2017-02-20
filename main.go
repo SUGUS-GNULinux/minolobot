@@ -44,11 +44,13 @@ func main() {
 	//////////////////
 	go func(bot *tgbotapi.BotAPI) {
 		doPole := interaction.StartPoleLogic()
-		// TODO find way to add generic chat id
+		// every pole signal sends pole message to every registered group
 		for _ = range doPole {
-			for id := range config.IDList {
-				msg := tgbotapi.NewMessage(id, "pole")
-				bot.Send(msg)
+			for id, chatConfig := range config.ConfigList {
+				if chatConfig.Enabled && chatConfig.IsGroup {
+					msg := tgbotapi.NewMessage(id, "pole")
+					bot.Send(msg)
+				}
 			}
 		}
 	}(bot)
@@ -59,8 +61,11 @@ nextUpdate:
 			continue
 		}
 		// chat id registration
-		if update.Message.Chat.IsGroup() && !config.IDList[update.Message.Chat.ID] {
-			config.IDList[update.Message.Chat.ID] = true
+		_, registered := config.ConfigList[update.Message.Chat.ID]
+		if !registered {
+			config.ConfigList[update.Message.Chat.ID] = config.NewChatConfig(
+				update.Message.Chat.IsGroup(),
+			)
 		}
 		// command processing
 		if update.Message.IsCommand() {
@@ -69,7 +74,7 @@ nextUpdate:
 				command.HelpCommand(bot, update)
 				continue
 			case "enable":
-				command.ActivityCommand(bot, update)
+				command.EnabledCommand(bot, update)
 				continue
 			case "answer":
 				command.AnswerFreq(bot, update)
@@ -82,11 +87,12 @@ nextUpdate:
 		// detection of ignore not enable conditions
 		mentionOrPrivate := strings.Contains(update.Message.Text, config.BotName) ||
 			update.Message.Chat.IsPrivate()
-		print(mentionOrPrivate)
+		// actual chat configuration for the update
+		chatConfig := config.ConfigList[update.Message.Chat.ID]
 		// if activity is not enabled just tries to receive the commands.
 		// if the message starts with @<botName> or a private msg,
 		// it ignores the disabled state.
-		if !config.Enabled && !mentionOrPrivate {
+		if !chatConfig.Enabled && !mentionOrPrivate {
 			continue
 		}
 		// pattern processing
@@ -101,7 +107,7 @@ nextUpdate:
 			}
 		}
 		// random answer
-		if rand.Intn(99) < config.PercentAnswer {
+		if rand.Intn(99) < chatConfig.PercentAnswer {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, interaction.Reply())
 			msg.ReplyToMessageID = update.Message.MessageID
 			bot.Send(msg)

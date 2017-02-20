@@ -2,7 +2,6 @@ package interaction
 
 import (
 	"math/rand"
-	"minolobot/config"
 	"time"
 )
 
@@ -20,13 +19,9 @@ func StartPoleLogic() <-chan bool {
 		// block until 00:00
 		<-firstSignal
 		tick := time.NewTicker(time.Hour * 24)
-		if config.Enabled {
-			go delayActivation(poleSignal)
-		}
+		go delayActivation(poleSignal)
 		for _ = range tick.C {
-			if config.Enabled {
-				go delayActivation(poleSignal)
-			}
+			go delayActivation(poleSignal)
 		}
 	}()
 	return poleSignal

@@ -8,13 +8,24 @@ import (
 	"os"
 )
 
-var (
+// ChatConfig contains the base configuration for a single user
+type ChatConfig struct {
 	// Enabled defines if the bot should answer
-	Enabled = true
+	Enabled bool
+	// PercentAnswer is the probability of anwser to any update
+	PercentAnswer int
+	// IsGroup is true if the related chat is a group
+	IsGroup bool
+}
+
+// NewChatConfig creastes a default chat configuration
+func NewChatConfig(isGroup bool) *ChatConfig {
+	return &ChatConfig{Enabled: true, PercentAnswer: 5, IsGroup: isGroup}
+}
+
+var (
 	// Token is the token value of the bot
 	Token string
-	// PercentAnswer is the probability of anwser to any update
-	PercentAnswer = 10
 	// BotName contains the @name of the bot after initializing in an account
 	BotName string
 )
@@ -39,12 +50,12 @@ var (
 	Phrases = []string{}
 	// CionList is the list of words ending with "cion"
 	CionList map[string]bool
-	// IDList contains all the user IDs of the updates of the actual session
-	IDList map[int64]bool
+	// ConfigList contains all the user configurations
+	ConfigList map[int64]*ChatConfig
 )
 
 func init() {
-	IDList = make(map[int64]bool)
+	ConfigList = make(map[int64]*ChatConfig)
 }
 
 // init "cion" ended words list and phrases list
