@@ -84,6 +84,8 @@ nextUpdate:
 				continue
 			}
 		}
+		// who in sugus
+		interaction.Who(bot, update)
 		// detection of ignore not enable conditions
 		mentionOrPrivate := strings.Contains(update.Message.Text, config.BotName) ||
 			update.Message.Chat.IsPrivate()
