@@ -2,6 +2,7 @@ package interaction
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -13,8 +14,10 @@ import (
 
 var regexpQuestion *regexp.Regexp
 
+const url = `https://sugus.eii.us.es/en_sugus.html`
+
 func init() {
-	question := "(?:(?:(?:q|Q)ui(?:e|é)n(?: hay| est(?:a|á))?)|alguien) " +
+	question := "(?:(?:(?:q|Q)ui(?:e|é)n(?: hay| est(?:a|á))?)|(?:A|a)lguien) " +
 		"(?:en|por) (?:s|S)ugus"
 	regexpQuestion = regexp.MustCompile(question)
 }
@@ -23,14 +26,20 @@ func init() {
 func Who(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	match := regexpQuestion.MatchString(u.Message.Text)
 	if match {
-		url := `https://sugus.eii.us.es/en_sugus.html`
+		var s string
 		res, err := http.Get(url)
 		if err == nil {
-			l := extractList(res.Body)
-			res.Body.Close()
-			msg := tgbotapi.NewMessage(u.Message.Chat.ID, string(l))
-			bot.Send(msg)
+			if res.StatusCode >= 200 && res.StatusCode < 300 {
+				s = extractList(res.Body)
+				res.Body.Close()
+			} else {
+				s = fmt.Sprint("HTTP status code ", res.StatusCode)
+			}
+		} else {
+			s = err.Error()
 		}
+		msg := tgbotapi.NewMessage(u.Message.Chat.ID, s)
+		bot.Send(msg)
 	}
 }
 
