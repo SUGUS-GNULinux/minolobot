@@ -19,7 +19,7 @@ func init() {
 func main() {
 	bot, err := tgbotapi.NewBotAPI(config.Token)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	} else {
 		config.BotName = "@" + bot.Self.UserName
 		log.Printf("Authorized on account %s", bot.Self.UserName)
@@ -28,7 +28,7 @@ func main() {
 	u.Timeout = 60
 	updates, err := bot.GetUpdatesChan(u)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	// needs time to get all the data
 	time.Sleep(time.Millisecond * 500)

@@ -34,14 +34,14 @@ var (
 func init() {
 	tokenFile, err := os.Open("datafiles/token")
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 	defer tokenFile.Close()
 	scanner := bufio.NewScanner(tokenFile)
 	if scanner.Scan() {
 		Token = string(scanner.Text())
 	} else {
-		panic("invalid token in token file content")
+		log.Fatal("invalid token in token file content")
 	}
 }
 
@@ -62,19 +62,19 @@ func init() {
 func init() {
 	cionFile, err := os.Open("datafiles/cion.csv")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer cionFile.Close()
 	phrasesFile, err := os.Open("datafiles/phrases.csv")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer phrasesFile.Close()
 	// init cion ended words map
 	rc := csv.NewReader(cionFile)
 	cionSlice, err := rc.Read()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	CionList = make(map[string]bool)
 	for _, word := range cionSlice {
@@ -84,6 +84,6 @@ func init() {
 	rp := csv.NewReader(phrasesFile)
 	Phrases, err = rp.Read()
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }
