@@ -34,11 +34,13 @@ type ChatConfig struct {
 	PercentAnswer int
 	// IsGroup is true if the related chat is a group
 	IsGroup bool
+	// Pole is true if the bot should say "Pole" every day
+	Pole bool
 }
 
 // NewChatConfig creastes a default chat configuration
 func NewChatConfig(isGroup bool) *ChatConfig {
-	return &ChatConfig{Enabled: true, PercentAnswer: 5, IsGroup: isGroup}
+	return &ChatConfig{Enabled: true, PercentAnswer: 5, IsGroup: isGroup, Pole: isGroup}
 }
 
 var (

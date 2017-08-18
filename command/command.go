@@ -1,4 +1,5 @@
 // Copyright 2017 Alejandro Sirgo Rica
+// Copyright 2018 Manuel López Ruiz <manuellr.git@gmail.com>
 //
 // This file is part of Minolobot.
 //
@@ -35,6 +36,8 @@ answer - probabilidad de responder con frases aleatorias
 status - estado del bot
 */
 
+const NoCommand string = "hola como uso un comando? unsaludogracias 😂"
+
 // HelpCommand prints the main information
 func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	help := "/enable - habilita o deshabilita las interacciones añadiendo" +
@@ -47,7 +50,7 @@ func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	bot.Send(msg)
 }
 
-// EnabledCommand handles the enabled or diabled status
+// EnabledCommand handles the enabled or disabled status
 func EnabledCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	msg := tgbotapi.NewMessage(u.Message.Chat.ID, "")
 	switch u.Message.CommandArguments() {
@@ -60,7 +63,7 @@ func EnabledCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 		chatID := u.Message.Chat.ID
 		config.ConfigList[chatID].Enabled = false
 	default:
-		msg.Text = "hola como uso un comando? unsaludogracias xd"
+		msg.Text = NoCommand
 	}
 	bot.Send(msg)
 }
@@ -70,13 +73,30 @@ func AnswerFreq(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	value, err := strconv.Atoi(u.Message.CommandArguments())
 	var msg tgbotapi.MessageConfig
 	if err != nil || err == nil && (value > 100 || value < 0) {
-		msg = tgbotapi.NewMessage(u.Message.Chat.ID,
-			"hola como uso un comando? unsaludogracias xd")
+		msg = tgbotapi.NewMessage(u.Message.Chat.ID, NoCommand)
 	} else {
 		chatID := u.Message.Chat.ID
 		config.ConfigList[chatID].PercentAnswer = value
 		msg = tgbotapi.NewMessage(u.Message.Chat.ID,
 			"omgggggg actualizaçao")
+	}
+	bot.Send(msg)
+}
+
+// PoleCommand handles the enabled or disabled pole
+func PoleCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
+	msg := tgbotapi.NewMessage(u.Message.Chat.ID, "")
+	switch u.Message.CommandArguments() {
+	case "true":
+		msg.Text = "👏"
+		chatID := u.Message.Chat.ID
+		config.ConfigList[chatID].Pole = true
+	case "false":
+		msg.Text = "trozo de mierda, tan cansado estás de mis poles? \n😣"
+		chatID := u.Message.Chat.ID
+		config.ConfigList[chatID].Pole = false
+	default:
+		msg.Text = NoCommand
 	}
 	bot.Send(msg)
 }

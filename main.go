@@ -1,4 +1,5 @@
 // Copyright 2017 Alejandro Sirgo Rica
+// Copyright 2018 Manuel López Ruiz <manuellr.git@gmail.com>
 //
 // This file is part of Minolobot.
 //
@@ -65,7 +66,7 @@ func main() {
 		// every pole signal sends pole message to every registered group
 		for _ = range doPole {
 			for id, chatConfig := range config.ConfigList {
-				if chatConfig.Enabled && chatConfig.IsGroup {
+				if chatConfig.Enabled && chatConfig.Pole {
 					msg := tgbotapi.NewMessage(id, "pole")
 					bot.Send(msg)
 				}
@@ -96,6 +97,9 @@ nextUpdate:
 				continue
 			case "answer":
 				command.AnswerFreq(bot, update)
+				continue
+			case "pole":
+				command.PoleCommand(bot, update)
 				continue
 			case "status":
 				command.Status(bot, update)
