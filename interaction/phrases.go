@@ -1,4 +1,5 @@
 // Copyright 2017 Alejandro Sirgo Rica
+// Copyright 2018 Manuel López Ruiz <manuellr.git@gmail.com>
 //
 // This file is part of Minolobot.
 //
@@ -61,6 +62,7 @@ func CheckCion(s string) (res string) {
 // CheckPs returns pspsps to a ps
 func CheckPs(s string) (res string) {
 	s = strings.ToLower(s)
+	s = strings.Replace(s, "https", "", -1)
 	if strings.Contains(s, "ps") {
 		res = strings.Repeat("ps", 4+rand.Intn(10))
 	}

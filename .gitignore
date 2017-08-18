@@ -1,2 +1,8 @@
 datafiles/token
 vendor
+
+# JetBrains IDEs
+.idea
+
+# Dolphin
+.directory
