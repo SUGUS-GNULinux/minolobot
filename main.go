@@ -85,6 +85,7 @@ nextUpdate:
 			config.ConfigList[update.Message.Chat.ID] = config.NewChatConfig(
 				update.Message.Chat.IsGroup(),
 			)
+			interaction.WelcomeInGroup(bot, update)
 		}
 		// command processing
 		if update.Message.IsCommand() {
