@@ -1,4 +1,5 @@
 // Copyright 2017 Alejandro Sirgo Rica
+// Copyright 2018 Manuel López Ruiz <manuellr.git@gmail.com>
 //
 // This file is part of Minolobot.
 //
@@ -20,6 +21,7 @@ package interaction
 import (
 	"math/rand"
 	"time"
+	"log"
 )
 
 // StartPoleLogic starts the logic to send a signal at 00:00, when it's
@@ -27,7 +29,14 @@ import (
 // of 24h.
 func StartPoleLogic() <-chan bool {
 	poleSignal := make(chan bool)
-	now := time.Now()
+
+	// Load timezone
+	utc, err := time.LoadLocation("Europe/Madrid")
+	if err != nil {
+		log.Fatal(err)
+	}
+	// Load current time with the deviation of the zone
+	now := time.Now().In(utc)
 	tomorrow := now.AddDate(0, 0, 1)
 	untilTwelve := time.Date(tomorrow.Year(), tomorrow.Month(), tomorrow.Day(),
 		0, 0, 0, 0, tomorrow.Location()).Sub(now)
