@@ -1,4 +1,5 @@
 // Copyright 2017 Alejandro Sirgo Rica
+// Copyright 2018 Manuel López Ruiz <manuellr.git@gmail.com>
 //
 // This file is part of Minolobot.
 //
@@ -75,32 +76,39 @@ func init() {
 	ConfigList = make(map[int64]*ChatConfig)
 }
 
-// init "cion" ended words list and phrases list
+// init "cion" ended words list
 func init() {
 	cionFile, err := os.Open("datafiles/cion.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer cionFile.Close()
+	rc := csv.NewReader(cionFile)
+	cionSlice, err := rc.ReadAll()
+	if err != nil {
+		log.Fatal(err)
+	}
+	// init cion ended words map
+	CionList = make(map[string]bool)
+	for _, line := range cionSlice {
+		CionList[line[0]] = true
+	}
+}
+
+// init phrases list
+func init() {
 	phrasesFile, err := os.Open("datafiles/phrases.csv")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer phrasesFile.Close()
-	// init cion ended words map
-	rc := csv.NewReader(cionFile)
-	cionSlice, err := rc.Read()
+	rp := csv.NewReader(phrasesFile)
+	phrasesSlice, err := rp.ReadAll()
 	if err != nil {
 		log.Fatal(err)
-	}
-	CionList = make(map[string]bool)
-	for _, word := range cionSlice {
-		CionList[word] = true
 	}
 	// init phrases list
-	rp := csv.NewReader(phrasesFile)
-	Phrases, err = rp.Read()
-	if err != nil {
-		log.Fatal(err)
+	for _, line := range phrasesSlice {
+		Phrases = append(Phrases, line[0])
 	}
 }
