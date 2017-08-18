@@ -44,6 +44,8 @@ func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 		" true o false tras el comando.\n" +
 		"/answer - probabilidad de responder con frases aleatorias, se define" +
 		" añadiendo un numero tras el comando entre 0 y 100\n" +
+		"/pole - habilita o deshabilita la pole añadiendo" +
+		" true o false tras el comando.\n" +
 		"/status - estado del bot\n" +
 		"pspsps"
 	msg := tgbotapi.NewMessage(u.Message.Chat.ID, help)
@@ -104,9 +106,10 @@ func PoleCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 // Status prints the internat status of the bot
 func Status(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	chatID := u.Message.Chat.ID
-	statusData := fmt.Sprintf("Answer: %d%%\nInteraction Enabled: %v\n",
+	statusData := fmt.Sprintf("Answer: %d%%\nInteraction Enabled: %v\nPole Enabled: %v\n",
 		config.ConfigList[chatID].PercentAnswer,
-		config.ConfigList[chatID].Enabled)
+		config.ConfigList[chatID].Enabled,
+		config.ConfigList[chatID].Pole)
 	msg := tgbotapi.NewMessage(u.Message.Chat.ID, statusData)
 	bot.Send(msg)
 }
