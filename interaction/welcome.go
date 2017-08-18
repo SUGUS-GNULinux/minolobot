@@ -18,8 +18,8 @@
 package interaction
 
 import (
-	"gopkg.in/telegram-bot-api.v4"
 	"github.com/SUGUS-GNULinux/minolobot/config"
+	"gopkg.in/telegram-bot-api.v4"
 )
 
 // Send a message when the bot has been added to a group

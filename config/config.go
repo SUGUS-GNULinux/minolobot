@@ -22,8 +22,12 @@ package config
 import (
 	"bufio"
 	"encoding/csv"
+	"encoding/json"
+	"github.com/SUGUS-GNULinux/minolobot/utilities"
+	"github.com/boltdb/bolt"
 	"log"
 	"os"
+	"strconv"
 )
 
 // ChatConfig contains the base configuration for a single user
@@ -36,6 +40,62 @@ type ChatConfig struct {
 	IsGroup bool
 	// Pole is true if the bot should say "Pole" every day
 	Pole bool
+}
+
+func CreateChatConfig(chatId int64, isGroup bool) *ChatConfig {
+	conf := NewChatConfig(isGroup)
+	err := utilities.Update("chatConfig", strconv.FormatInt(chatId, 10), conf)
+	if err != nil {
+		log.Println(err)
+	}
+	return conf
+}
+
+func UpdateChatConfig(chatId int64, input *ChatConfig) error {
+	err := utilities.Update("chatConfig", strconv.FormatInt(chatId, 10), input)
+	if err != nil {
+		log.Println(err)
+	}
+	return err
+}
+
+func FindChatConfig(chatId int64) (res *ChatConfig, err error) {
+	err = utilities.View("chatConfig", strconv.FormatInt(chatId, 10), &res)
+	return
+}
+
+func FindAllChatConfigWithId() (map[int64]ChatConfig, error) {
+	bucketName := "chatConfig"
+
+	res := make(map[int64]ChatConfig)
+
+	err := utilities.BoltDB.View(func(tx *bolt.Tx) error {
+		// Get the bucket
+		b := tx.Bucket([]byte(bucketName))
+		if b == nil {
+			return bolt.ErrBucketNotFound
+		}
+		// Retrieve the records
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			key, err := strconv.ParseInt(string(k), 10, 0)
+			if err != nil {
+				log.Println(err)
+			}
+
+			// Decode the record
+			var value ChatConfig
+			err = json.Unmarshal(v, &value)
+			if err != nil {
+				log.Println(err)
+			}
+
+			res[key] = value
+		}
+		return nil
+	})
+
+	return res, err
 }
 
 // NewChatConfig creastes a default chat configuration
@@ -70,13 +130,7 @@ var (
 	Phrases = []string{}
 	// CionList is the list of words ending with "cion"
 	CionList map[string]bool
-	// ConfigList contains all the user configurations
-	ConfigList map[int64]*ChatConfig
 )
-
-func init() {
-	ConfigList = make(map[int64]*ChatConfig)
-}
 
 // init "cion" ended words list
 func init() {

@@ -1,6 +1,9 @@
 datafiles/token
 vendor
 
+# Database
+minolobot.db
+
 # JetBrains IDEs
 .idea
 
