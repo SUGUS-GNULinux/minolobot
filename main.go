@@ -64,8 +64,9 @@ func main() {
 	go func(bot *tgbotapi.BotAPI) {
 		doPole := interaction.StartPoleLogic()
 		// every pole signal sends pole message to every registered group
-		for _ = range doPole {
-			for id, chatConfig := range config.ConfigList {
+		for range doPole {
+			chatsConfig, _ := config.FindAllChatConfigWithId()
+			for id, chatConfig := range chatsConfig {
 				if chatConfig.Enabled && chatConfig.Pole {
 					msg := tgbotapi.NewMessage(id, "pole")
 					bot.Send(msg)
@@ -79,25 +80,24 @@ nextUpdate:
 		if update.Message == nil {
 			continue
 		}
-		// chat id registration
-		_, registered := config.ConfigList[update.Message.Chat.ID]
-		if !registered {
-			config.ConfigList[update.Message.Chat.ID] = config.NewChatConfig(
-				update.Message.Chat.IsGroup(),
-			)
+		chatID := update.Message.Chat.ID
+
+		// chat id registration and configuration
+		chatConfig, registered := config.FindChatConfig(chatID)
+		if registered != nil {
+			chatConfig = config.CreateChatConfig(chatID, update.Message.Chat.IsGroup())
 			interaction.WelcomeInGroup(bot, update)
 		}
 		// command processing
 		if update.Message.IsCommand() {
 			command.AnalyzeCommand(bot, update)
 		}
+
 		// who in sugus
 		interaction.Who(bot, update)
 		// detection of ignore not enable conditions
 		mentionOrPrivate := strings.Contains(update.Message.Text, config.BotName) ||
 			update.Message.Chat.IsPrivate()
-		// actual chat configuration for the update
-		chatConfig := config.ConfigList[update.Message.Chat.ID]
 		// if activity is not enabled just tries to receive the commands.
 		// if the message starts with @<botName> or a private msg,
 		// it ignores the disabled state.
@@ -109,7 +109,7 @@ nextUpdate:
 		for _, task := range listTasks {
 			// if we get content to send from an interaction generator function we send it
 			if modString := task(s); modString != "" {
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, modString)
+				msg := tgbotapi.NewMessage(chatID, modString)
 				msg.ReplyToMessageID = update.Message.MessageID
 				msg.ParseMode = "MARKDOWN"
 				bot.Send(msg)
@@ -118,7 +118,7 @@ nextUpdate:
 		}
 		// random answer
 		if rand.Intn(99) < chatConfig.PercentAnswer {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, interaction.Reply())
+			msg := tgbotapi.NewMessage(chatID, interaction.Reply())
 			msg.ReplyToMessageID = update.Message.MessageID
 			bot.Send(msg)
 		}

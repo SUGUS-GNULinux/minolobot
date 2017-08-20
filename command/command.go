@@ -26,6 +26,7 @@ import (
 	"github.com/SUGUS-GNULinux/minolobot/config"
 
 	"gopkg.in/telegram-bot-api.v4"
+	"log"
 )
 
 /*
@@ -37,6 +38,8 @@ status - estado del bot
 */
 
 const NoCommand string = "hola como uso un comando? unsaludogracias 😂"
+const InternalError string = "Uy, algún sugusiano me ha programado mal y acabo de dar un pete interno.\n" +
+								"Activando protocolo dedo oreja"
 const OnlyAdmin string = "acaso eres admin? Que *P* y que *S*" // Need ParseMode Markdown
 
 func init() {
@@ -68,18 +71,27 @@ func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 
 // EnabledCommand handles the enabled or disabled status
 func EnabledCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(u.Message.Chat.ID, "")
-	switch u.Message.CommandArguments() {
-	case "true":
-		msg.Text = "ey b0ss"
-		chatID := u.Message.Chat.ID
-		config.ConfigList[chatID].Enabled = true
-	case "false":
-		msg.Text = "ye"
-		chatID := u.Message.Chat.ID
-		config.ConfigList[chatID].Enabled = false
-	default:
-		msg.Text = NoCommand
+	chatID := u.Message.Chat.ID
+	msg := tgbotapi.NewMessage(chatID, "")
+	chatConfig, err := config.FindChatConfig(chatID)
+	if err != nil {
+		log.Println(err)
+		msg.Text = InternalError
+	} else {
+		switch u.Message.CommandArguments() {
+		case "true":
+			msg.Text = "ey b0ss"
+			chatConfig.Enabled = true
+		case "false":
+			msg.Text = "ye"
+			chatConfig.Enabled = false
+		default:
+			msg.Text = NoCommand
+		}
+		err = config.UpdateChatConfig(chatID, chatConfig)
+		if err != nil {
+			msg.Text = InternalError
+		}
 	}
 	bot.Send(msg)
 }
@@ -87,32 +99,51 @@ func EnabledCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 // AnswerFreq handles the asignation of a new frequence in the answers
 func AnswerFreq(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	value, err := strconv.Atoi(u.Message.CommandArguments())
-	var msg tgbotapi.MessageConfig
+
+	chatID := u.Message.Chat.ID
+	msg := tgbotapi.NewMessage(chatID, "")
 	if err != nil || err == nil && (value > 100 || value < 0) {
-		msg = tgbotapi.NewMessage(u.Message.Chat.ID, NoCommand)
+		msg.Text = NoCommand
+	} else if chatConfig, err := config.FindChatConfig(chatID); err == nil {
+		// Do update
+		chatConfig.PercentAnswer = value
+		err = config.UpdateChatConfig(chatID, chatConfig)
+		if err == nil {
+			msg.Text = "omgggggg actualizaçao"
+		} else {
+			log.Println(err)
+			msg.Text = InternalError
+		}
 	} else {
-		chatID := u.Message.Chat.ID
-		config.ConfigList[chatID].PercentAnswer = value
-		msg = tgbotapi.NewMessage(u.Message.Chat.ID,
-			"omgggggg actualizaçao")
+		log.Println(err)
+		msg.Text = InternalError
 	}
 	bot.Send(msg)
 }
 
 // PoleCommand handles the enabled or disabled pole
 func PoleCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(u.Message.Chat.ID, "")
-	switch u.Message.CommandArguments() {
-	case "true":
-		msg.Text = "👏"
-		chatID := u.Message.Chat.ID
-		config.ConfigList[chatID].Pole = true
-	case "false":
-		msg.Text = "trozo de mierda, tan cansado estás de mis poles? \n😣"
-		chatID := u.Message.Chat.ID
-		config.ConfigList[chatID].Pole = false
-	default:
-		msg.Text = NoCommand
+	chatID := u.Message.Chat.ID
+	msg := tgbotapi.NewMessage(chatID, "")
+	chatConfig, err := config.FindChatConfig(chatID)
+	if err != nil {
+		log.Println(err)
+		msg.Text = InternalError
+	} else {
+		switch u.Message.CommandArguments() {
+		case "true":
+			msg.Text = "👏"
+			chatConfig.Pole = true
+		case "false":
+			msg.Text = "trozo de mierda, tan cansado estás de mis poles? \n😣"
+			chatConfig.Pole = false
+		default:
+			msg.Text = NoCommand
+		}
+		err = config.UpdateChatConfig(chatID, chatConfig)
+		if err != nil {
+			msg.Text = InternalError
+		}
 	}
 	bot.Send(msg)
 }
@@ -120,10 +151,11 @@ func PoleCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 // Status prints the internat status of the bot
 func Status(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	chatID := u.Message.Chat.ID
+	chatConfig, _ := config.FindChatConfig(chatID)
 	statusData := fmt.Sprintf("Answer: %d%%\nInteraction Enabled: %v\nPole Enabled: %v\n",
-		config.ConfigList[chatID].PercentAnswer,
-		config.ConfigList[chatID].Enabled,
-		config.ConfigList[chatID].Pole)
+		chatConfig.PercentAnswer,
+		chatConfig.Enabled,
+		chatConfig.Pole)
 	msg := tgbotapi.NewMessage(u.Message.Chat.ID, statusData)
 	bot.Send(msg)
 }

@@ -19,9 +19,9 @@
 package interaction
 
 import (
+	"log"
 	"math/rand"
 	"time"
-	"log"
 )
 
 // StartPoleLogic starts the logic to send a signal at 00:00, when it's
