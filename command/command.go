@@ -39,11 +39,24 @@ status - estado del bot
 
 const NoCommand string = "hola como uso un comando? unsaludogracias 😂"
 const InternalError string = "Uy, algún sugusiano me ha programado mal y acabo de dar un pete interno.\n" +
-	"Activando protocolo dedo oreja"
+								"Activando protocolo dedo oreja"
+const OnlyAdmin string = "acaso eres admin? Que *P* y que *S*" // Need ParseMode Markdown
+
+func init() {
+	CommandsFilter = make(map[string]CommandFilter)
+
+	// Maping functions with corresponding command
+	addCommand("answer", true, AnswerFreq)
+	addCommand("enable", true, EnabledCommand)
+	addCommand("help", false, HelpCommand)
+	addCommand("pole", true, PoleCommand)
+	addCommand("status", true, Status)
+}
 
 // HelpCommand prints the main information
 func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
-	help := "/enable - habilita o deshabilita las interacciones añadiendo" +
+	help := "Todas las configuraciones persistiran únicamente en el chat actual" +
+		"/enable - habilita o deshabilita las interacciones añadiendo" +
 		" true o false tras el comando.\n" +
 		"/answer - probabilidad de responder con frases aleatorias, se define" +
 		" añadiendo un numero tras el comando entre 0 y 100\n" +
@@ -51,7 +64,8 @@ func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 		" true o false tras el comando.\n" +
 		"/status - estado del bot\n" +
 		"pspsps"
-	msg := tgbotapi.NewMessage(u.Message.Chat.ID, help)
+	dest := int64(u.Message.From.ID) // Avoids answering groups
+	msg := tgbotapi.NewMessage(dest, help)
 	bot.Send(msg)
 }
 

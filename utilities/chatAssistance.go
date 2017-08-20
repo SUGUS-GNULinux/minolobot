@@ -15,21 +15,34 @@
 //     You should have received a copy of the GNU General Public License
 //     along with Minolobot.  If not, see <http://www.gnu.org/licenses/>.
 
-package interaction
+// Package command contains all the commands
+package utilities
 
 import (
-	"github.com/SUGUS-GNULinux/minolobot/config"
 	"gopkg.in/telegram-bot-api.v4"
+	"log"
 )
 
-// Send a message when the bot has been added to a group
-func WelcomeInGroup(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
-	if !u.Message.Chat.IsPrivate() {
-		text := "Hola, soy " + config.BotName + "\nVamos a *zozobrarnos* juntos !\n" +
-			"_(Pssst, si necesitas ayuda_ [hablame por privado](https://t.me/" + config.BotName[1:] + ")_)_"
-
-		msg := tgbotapi.NewMessage(u.Message.Chat.ID, text)
-		msg.ParseMode = "MARKDOWN"
-		bot.Send(msg)
+// Check if the user that send the message is admin
+func IsChatAdminUser(bot *tgbotapi.BotAPI, m tgbotapi.Message) bool {
+	if m.Chat.IsPrivate() {
+		return true
 	}
+
+	chatConfig := tgbotapi.ChatConfig{
+		ChatID: m.Chat.ID,
+	}
+	members, err := bot.GetChatAdministrators(chatConfig)
+
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	for _, member := range members {
+		if member.User.ID == m.From.ID {
+			return true
+		}
+	}
+	return false
 }
