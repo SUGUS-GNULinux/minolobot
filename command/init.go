@@ -51,6 +51,7 @@ func AnalyzeCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 		actCommand.Func(bot, u)
 	} else {
 		msg := tgbotapi.NewMessage(u.Message.Chat.ID, OnlyAdmin)
+		msg.ParseMode = "MARKDOWN"
 		bot.Send(msg)
 	}
 }

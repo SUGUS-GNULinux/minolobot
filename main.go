@@ -111,6 +111,7 @@ nextUpdate:
 			if modString := task(s); modString != "" {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, modString)
 				msg.ReplyToMessageID = update.Message.MessageID
+				msg.ParseMode = "MARKDOWN"
 				bot.Send(msg)
 				continue nextUpdate
 			}
