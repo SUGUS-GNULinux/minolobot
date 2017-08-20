@@ -89,23 +89,7 @@ nextUpdate:
 		}
 		// command processing
 		if update.Message.IsCommand() {
-			switch update.Message.Command() {
-			case "help":
-				command.HelpCommand(bot, update)
-				continue
-			case "enable":
-				command.EnabledCommand(bot, update)
-				continue
-			case "answer":
-				command.AnswerFreq(bot, update)
-				continue
-			case "pole":
-				command.PoleCommand(bot, update)
-				continue
-			case "status":
-				command.Status(bot, update)
-				continue
-			}
+			command.AnalyzeCommand(bot, update)
 		}
 		// who in sugus
 		interaction.Who(bot, update)
@@ -127,6 +111,7 @@ nextUpdate:
 			if modString := task(s); modString != "" {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, modString)
 				msg.ReplyToMessageID = update.Message.MessageID
+				msg.ParseMode = "MARKDOWN"
 				bot.Send(msg)
 				continue nextUpdate
 			}

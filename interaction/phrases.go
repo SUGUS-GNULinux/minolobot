@@ -53,7 +53,7 @@ func CheckCion(s string) (res string) {
 		beg := strings.LastIndex(s[:end], " ") + 1
 		cionWord := s[beg:end]
 		if ok := config.CionList[cionWord]; ok {
-			res = strings.Replace(cionWord, "cion", "çao", 1)
+			res = strings.Replace(cionWord, "cion", "*çao*", 1)
 		}
 	}
 	return
