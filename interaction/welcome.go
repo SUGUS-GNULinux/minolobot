@@ -26,7 +26,7 @@ import (
 func WelcomeInGroup(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 	if !u.Message.Chat.IsPrivate() {
 		text := "Hola, soy " + config.BotName + "\nVamos a *zozobrarnos* juntos !\n" +
-			"_(Pssst, si necesitas ayuda usa el comando _/help" + config.BotName + "_)_"
+			"_(Pssst, si necesitas ayuda_ [hablame por privado](https://t.me/" + config.BotName[1:] + ")_)_"
 
 		msg := tgbotapi.NewMessage(u.Message.Chat.ID, text)
 		msg.ParseMode = "MARKDOWN"
