@@ -111,11 +111,11 @@ func AnswerFreq(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 		if err == nil {
 			msg.Text = "omgggggg actualizaçao"
 		} else {
-			fmt.Println(err)
+			log.Println(err)
 			msg.Text = InternalError
 		}
 	} else {
-		fmt.Println(err)
+		log.Println(err)
 		msg.Text = InternalError
 	}
 	bot.Send(msg)
