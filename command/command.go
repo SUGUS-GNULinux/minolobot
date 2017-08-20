@@ -55,7 +55,7 @@ func init() {
 
 // HelpCommand prints the main information
 func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
-	help := "Todas las configuraciones persistiran únicamente en el chat actual" +
+	help := "Todas las configuraciones persistiran *únicamente* en el *chat actual*\n" +
 		"/enable - habilita o deshabilita las interacciones añadiendo" +
 		" true o false tras el comando.\n" +
 		"/answer - probabilidad de responder con frases aleatorias, se define" +
@@ -66,6 +66,7 @@ func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 		"pspsps"
 	dest := int64(u.Message.From.ID) // Avoids answering groups
 	msg := tgbotapi.NewMessage(dest, help)
+	msg.ParseMode = "MARKDOWN"
 	bot.Send(msg)
 }
 
