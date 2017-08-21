@@ -36,13 +36,13 @@ type CommandFilter struct {
 var CommandsFilter map[string]CommandFilter
 
 // Analize the command and execute the corresponding function
-func AnalyzeCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
+func AnalyzeCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) (executed bool) {
 	c := u.Message.Command()
 	actCommand, exist := CommandsFilter[c]
 
 	// Check if command detected
 	if !exist {
-		return
+		return false
 	}
 
 	// Check only admin
@@ -54,6 +54,7 @@ func AnalyzeCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 		msg.ParseMode = "MARKDOWN"
 		bot.Send(msg)
 	}
+	return true
 }
 
 // Add a command to the CommandsFilter
