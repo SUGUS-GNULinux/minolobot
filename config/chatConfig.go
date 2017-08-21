@@ -28,7 +28,7 @@ import (
 	"time"
 )
 
-// ChatConfig contains the base configuration for a single user
+// ChatConfig contains the base configuration for a single chat
 type ChatConfig struct {
 	// Enabled defines if the bot should answer
 	Enabled bool
@@ -45,7 +45,7 @@ type ChatConfig struct {
 // bucketChatConfig define the bucketName in BoltDB
 const bucketChatConfig = "chatConfig"
 
-// Contains the timer for the automatic conversation enabled
+// Contains the timers for the automatic conversation enabled
 var AutoEnableTimer map[int64]*time.Timer
 
 func init() {
@@ -53,6 +53,7 @@ func init() {
 	reScheduleAutoEnable()
 }
 
+// CreateChatConfig Initialize the ChatConfig for the chatId and persist it
 func CreateChatConfig(chatId int64, isGroup bool) *ChatConfig {
 	conf := NewChatConfig(isGroup)
 	err := utilities.Update(bucketChatConfig, strconv.FormatInt(chatId, 10), conf)
@@ -62,6 +63,7 @@ func CreateChatConfig(chatId int64, isGroup bool) *ChatConfig {
 	return conf
 }
 
+// UpdateChatConfig Persist the ChatConfig for the chatId
 func UpdateChatConfig(chatId int64, input *ChatConfig) error {
 	err := utilities.Update(bucketChatConfig, strconv.FormatInt(chatId, 10), input)
 	if err != nil {
@@ -70,11 +72,13 @@ func UpdateChatConfig(chatId int64, input *ChatConfig) error {
 	return err
 }
 
+// FindChatConfig Find the ChatConfig for the chatId
 func FindChatConfig(chatId int64) (res *ChatConfig, err error) {
 	err = utilities.View(bucketChatConfig, strconv.FormatInt(chatId, 10), &res)
 	return
 }
 
+// FindAllChatConfigWithId Return all the ChatConfig in a map with the chatId
 func FindAllChatConfigWithId() (map[int64]ChatConfig, error) {
 	res := make(map[int64]ChatConfig)
 
@@ -99,6 +103,7 @@ func FindAllChatConfigWithId() (map[int64]ChatConfig, error) {
 				log.Println(err)
 			}
 
+			// Add the record to the result map
 			res[key] = value
 		}
 		return nil

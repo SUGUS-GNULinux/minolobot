@@ -35,8 +35,6 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
-var bot *tgbotapi.BotAPI
-
 func main() {
 	bot, err := tgbotapi.NewBotAPI(config.Token)
 	if err != nil {

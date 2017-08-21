@@ -29,13 +29,14 @@ var (
 		"deshabil":  34 * time.Minute,
 		"tomar por": 2 * time.Hour,
 	}
-	silencExpressionsAplana []string
+	silenceExpressionsKeys []string
 )
 
 func init() {
-	silencExpressionsAplana = make([]string, 0)
+	// Create the silenceExpressionsKeys array from the silencExpressions keys
+	silenceExpressionsKeys = make([]string, 0)
 	for k := range silencExpressions {
-		silencExpressionsAplana = append(silencExpressionsAplana, k)
+		silenceExpressionsKeys = append(silenceExpressionsKeys, k)
 	}
 }
 
@@ -55,7 +56,7 @@ func CheckDisable(bot *tgbotapi.BotAPI, u tgbotapi.Update) (status bool) {
 	}
 
 	// Check for generic silence expression
-	genericSilence, found := utilities.AnyInSliceIntoString(s, silencExpressionsAplana)
+	genericSilence, found := utilities.AnyInSliceIntoString(s, silenceExpressionsKeys)
 	if !found {
 		return
 	}
@@ -95,14 +96,8 @@ func CheckDisable(bot *tgbotapi.BotAPI, u tgbotapi.Update) (status bool) {
 	return true
 }
 
-func enable(action bool, chatId int64) error {
-	log.Print(chatId, action)
-	log.Println("No se ha implementado el método para habilitar o deshabilitar el enable ")
-	return nil
-}
-
 func getTimeFromMessage(a string) (string, float64, bool) {
-	a = utilities.DeleteRebundantSpaces(a)
+	a = utilities.DeleteRedundantSpaces(a)
 	// Iterate among all possible values
 	for _, b := range timeExpressions {
 		if i := strings.Index(a, b); i >= 0 {
@@ -117,7 +112,7 @@ func getTimeFromMessage(a string) (string, float64, bool) {
 				if err == nil && time > 0 {
 					return b, time, true
 				} else if err == nil && time < 0 {
-					// If time is negative... It'a a hacking attempt
+					// If time is negative... It's A Trap!! (youtu.be/4F4qzPbcFiA)
 					return command.HackingAttempt, 0, false
 				} else if time, ok := undefinedTime[aSlice[len(aSlice)-1]]; ok {
 					// If not is a numeric value it could be a generic time

@@ -1,7 +1,6 @@
 package utilities
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 )
@@ -13,6 +12,7 @@ func init() {
 	regexpSpaces = regexp.MustCompile(space)
 }
 
+// AnyInSliceIntoString check if the string contains any string from the slice
 func AnyInSliceIntoString(a string, list []string) (string, bool) {
 	for _, b := range list {
 		if strings.Contains(a, b) {
@@ -22,8 +22,8 @@ func AnyInSliceIntoString(a string, list []string) (string, bool) {
 	return "", false
 }
 
-func DeleteRebundantSpaces(a string) string {
+// DeleteRedundantSpaces if the string contain more than a space, it replace it by 1 space
+func DeleteRedundantSpaces(a string) string {
 	res := regexpSpaces.ReplaceAllString(a, " ")
-	fmt.Println(res)
 	return res
 }
