@@ -5,7 +5,6 @@ import (
 	"github.com/SUGUS-GNULinux/minolobot/config"
 	"github.com/SUGUS-GNULinux/minolobot/utilities"
 	"gopkg.in/telegram-bot-api.v4"
-	"log"
 	"strconv"
 	"strings"
 	"time"
