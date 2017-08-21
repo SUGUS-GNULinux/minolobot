@@ -41,6 +41,7 @@ const NoCommand string = "hola como uso un comando? unsaludogracias 😂"
 const InternalError string = "Uy, algún sugusiano me ha programado mal y acabo de dar un pete interno.\n" +
 								"Activando protocolo dedo oreja"
 const OnlyAdmin string = "acaso eres admin? Que *P* y que *S*" // Need ParseMode Markdown
+const HackingAttempt string = "acabas de disipar todas mis dudas, definitivamente eres tonto"
 
 func init() {
 	CommandsFilter = make(map[string]CommandFilter)
@@ -72,27 +73,23 @@ func HelpCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
 
 // EnabledCommand handles the enabled or disabled status
 func EnabledCommand(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
+	var err error
 	chatID := u.Message.Chat.ID
 	msg := tgbotapi.NewMessage(chatID, "")
-	chatConfig, err := config.FindChatConfig(chatID)
+
+	switch u.Message.CommandArguments() {
+	case "true":
+		msg.Text = "ey b0ss"
+		err = config.EnabledChatConfig(true, nil, chatID)
+	case "false":
+		msg.Text = "ye"
+		err = config.EnabledChatConfig(false, nil, chatID)
+	default:
+		msg.Text = NoCommand
+	}
 	if err != nil {
 		log.Println(err)
 		msg.Text = InternalError
-	} else {
-		switch u.Message.CommandArguments() {
-		case "true":
-			msg.Text = "ey b0ss"
-			chatConfig.Enabled = true
-		case "false":
-			msg.Text = "ye"
-			chatConfig.Enabled = false
-		default:
-			msg.Text = NoCommand
-		}
-		err = config.UpdateChatConfig(chatID, chatConfig)
-		if err != nil {
-			msg.Text = InternalError
-		}
 	}
 	bot.Send(msg)
 }

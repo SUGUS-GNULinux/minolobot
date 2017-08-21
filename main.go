@@ -35,6 +35,8 @@ func init() {
 	rand.Seed(time.Now().UTC().UnixNano())
 }
 
+var bot *tgbotapi.BotAPI
+
 func main() {
 	bot, err := tgbotapi.NewBotAPI(config.Token)
 	if err != nil {
@@ -90,7 +92,10 @@ nextUpdate:
 		}
 		// command processing
 		if update.Message.IsCommand() {
-			command.AnalyzeCommand(bot, update)
+			ok := command.AnalyzeCommand(bot, update)
+			if ok {
+				continue nextUpdate
+			}
 		}
 
 		// who in sugus
@@ -104,6 +109,11 @@ nextUpdate:
 		if !chatConfig.Enabled && !mentionOrPrivate {
 			continue
 		}
+
+		if interaction.CheckDisable(bot, update) {
+			continue nextUpdate
+		}
+
 		// pattern processing
 		s := string(update.Message.Text)
 		for _, task := range listTasks {
