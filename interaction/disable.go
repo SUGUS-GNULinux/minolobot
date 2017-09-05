@@ -4,6 +4,7 @@ import (
 	"github.com/SUGUS-GNULinux/minolobot/command"
 	"github.com/SUGUS-GNULinux/minolobot/config"
 	"github.com/SUGUS-GNULinux/minolobot/utilities"
+	"golang.org/x/text/transform"
 	"gopkg.in/telegram-bot-api.v4"
 	"strconv"
 	"strings"
@@ -54,6 +55,14 @@ func CheckDisable(bot *tgbotapi.BotAPI, u tgbotapi.Update) (status bool) {
 		return
 	}
 
+	s, _, err := transform.String(utilities.ToStringTransformer, s)
+
+	if err != nil {
+		msg.Text = command.InternalError
+		bot.Send(msg)
+		return false
+	}
+
 	// Check for generic silence expression
 	genericSilence, found := utilities.AnyInSliceIntoString(s, silenceExpressionsKeys)
 	if !found {
@@ -83,7 +92,7 @@ func CheckDisable(bot *tgbotapi.BotAPI, u tgbotapi.Update) (status bool) {
 	scheduleFor := time.Now().Local().Add(d)
 
 	// Disable bot
-	err := config.EnabledChatConfig(false, &scheduleFor, u.Message.Chat.ID)
+	err = config.EnabledChatConfig(false, &scheduleFor, u.Message.Chat.ID)
 	if err != nil {
 		msg.Text = command.InternalError
 		return true

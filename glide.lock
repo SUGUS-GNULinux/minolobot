@@ -1,10 +1,20 @@
-hash: c35dd260f52149b91e46c480789bbc9885ac985a21ed7cb73a9ce13ab91a0c66
-updated: 2017-08-18T13:08:07.55706925+02:00
+hash: c2ae4e1efde4b65cd2c8ac0a123e50f922d464a7c4a05d2d92333965e2eeeed9
+updated: 2017-09-05T19:35:50.882412824+02:00
 imports:
 - name: github.com/boltdb/bolt
   version: 2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8
 - name: github.com/technoweenie/multipartstreamer
   version: a90a01d73ae432e2611d178c18367fbaa13e0154
+- name: golang.org/x/sys
+  version: e48874b42435b4347fc52bdee0424a52abc974d7
+  subpackages:
+  - unix
+- name: golang.org/x/text
+  version: bd91bbf73e9a4a801adbfb97133c992678533126
+  subpackages:
+  - runes
+  - transform
+  - unicode/norm
 - name: gopkg.in/telegram-bot-api.v4
   version: 0a57807db79efce7f6719fbb2c0e0f83fda79aec
 testImports: []
