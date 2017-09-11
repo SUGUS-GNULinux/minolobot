@@ -1,4 +1,4 @@
-// Copyright 2017 Alejandro Sirgo Rica
+// Copyright 2017-2018 SUGUS GNU/Linux <sugus@us.es>
 //
 // This file is part of Minolobot.
 //
