@@ -41,7 +41,9 @@ func init() {
 
 // Who identifies when someone
 func Who(bot *tgbotapi.BotAPI, u tgbotapi.Update) {
-	match := regexpQuestion.MatchString(u.Message.Text)
+	mText := u.Message.Text
+	match := strings.EqualFold(mText, "who") || strings.EqualFold(mText, "quien")
+	match = match || regexpQuestion.MatchString(mText)
 	if match {
 		var s string
 		res, err := http.Get(url)
