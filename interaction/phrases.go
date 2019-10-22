@@ -21,9 +21,16 @@ package interaction
 import (
 	"math/rand"
 	"strings"
-
+	"regexp"
 	"github.com/SUGUS-GNULinux/minolobot/config"
 )
+
+var regexpPs *regexp.Regexp
+
+func init() {
+	ps := ".*\\b(ps)+\\b.*"
+	regexpPs = regexp.MustCompile(ps)
+}
 
 // Reply returns a phrase randomly
 func Reply() string {
@@ -61,8 +68,8 @@ func CheckCion(s string) (res string) {
 // CheckPs returns pspsps to a ps
 func CheckPs(s string) (res string) {
 	s = strings.ToLower(s)
-	s = strings.Replace(s, "https", "", -1)
-	if strings.Contains(s, "ps") {
+	match := regexpPs.MatchString(s)
+	if match {
 		res = strings.Repeat("ps", 4+rand.Intn(10))
 	}
 	return
